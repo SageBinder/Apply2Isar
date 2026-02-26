@@ -1,0 +1,8 @@
+session Apply2Isar = "HOL" +
+  sessions
+    "HOL-Algebra"
+  theories
+    Apply2Isar
+    Prep2Isar
+    BasicExamples
+    AlgExamples
