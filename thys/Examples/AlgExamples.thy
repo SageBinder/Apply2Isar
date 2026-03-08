@@ -1,6 +1,6 @@
 theory AlgExamples
   imports
-    Apply2Isar
+    "Apply2Isar.Apply2Isar"
     "HOL.Modules"
     "HOL-Algebra.IntRing"
     "HOL-Algebra.Bij"
@@ -9,6 +9,8 @@ theory AlgExamples
     "HOL-Algebra.Exact_Sequence"
 
 begin
+
+text "These are some examples of Apply2Isar on apply scripts from the HOL-Algebra library."
 
 section "Test 1"
 

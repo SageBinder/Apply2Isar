@@ -25,52 +25,39 @@ fun print_message ctxt a b = trace_msg ctxt (pretty ("(" ^ a ^ ", " ^ b ^ ")")) 
 
 val print_types_flag = Attrib.setup_config_string \<^binding>\<open>apply2isar_print_types\<close> (K "necessary");
 
-val split_subgoals_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_split_subgoals\<close> (K false);
-
-val split_fact_tac_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_split_fact_tac\<close> (K false);
-
 val smart_goals_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_smart_goals\<close> (K true);
-
-val dummy_subproofs_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_dummy_subproofs\<close> (K false);
-
-val named_facts_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_named_facts\<close> (K true);
-
-val subgoal_fix_fresh_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_subgoal_fix_fresh\<close> (K false);
 
 val smart_unfolds_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_smart_unfolds\<close> (K true);
 
+val named_facts_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_named_facts\<close> (K true);
+
+val dummy_subproofs_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_dummy_subproofs\<close> (K false);
+
+val subgoal_fix_fresh_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_subgoal_fix_fresh\<close> (K false);
+
 val linebreaks_flag = Attrib.setup_config_bool \<^binding>\<open>apply2isar_linebreaks\<close> (K false);
-
-val timeout_opt = Attrib.setup_config_int \<^binding>\<open>apply2isar_timeout\<close> (K 30);
-
-val experimental_split_combined_tacs_flag =
-  Attrib.setup_config_bool \<^binding>\<open>apply2isar_experimental_split_combined_tacs\<close> (K false);
 
 val fact_name_prefix_opt =
   Attrib.setup_config_string \<^binding>\<open>apply2isar_fact_name_prefix\<close> (K "h");
 
+val timeout_opt = Attrib.setup_config_int \<^binding>\<open>apply2isar_timeout\<close> (K 30);
+
 type apply2isar_options = {
-  split_subgoals : bool,
-  split_fact_tac : bool,
   smart_goals : bool,
   dummy_subproofs : bool,
   named_facts : bool,
   smart_unfolds : bool,
   subgoal_fix_fresh : bool,
-  experimental_split_combined_tacs : bool,
   fact_name_prefix : string,
   linebreaks : bool
 }
 
 fun options_from_ctxt ctxt = {
-  split_subgoals = Config.get ctxt split_subgoals_flag,
-  split_fact_tac = Config.get ctxt split_fact_tac_flag,
   smart_goals = Config.get ctxt smart_goals_flag,
   dummy_subproofs = Config.get ctxt dummy_subproofs_flag,
   named_facts = Config.get ctxt named_facts_flag,
   smart_unfolds = Config.get ctxt smart_unfolds_flag,
   subgoal_fix_fresh = Config.get ctxt subgoal_fix_fresh_flag,
-  experimental_split_combined_tacs = Config.get ctxt experimental_split_combined_tacs_flag,
   fact_name_prefix = Config.get ctxt fact_name_prefix_opt,
   linebreaks = Config.get ctxt linebreaks_flag
 } : apply2isar_options
@@ -1742,7 +1729,6 @@ fun
 fun mk_fact_tac options x =
 let
   val tac = if #tac x = "" then "" else " ( " ^ (#tac x) ^ " )"
-  val apply_tac = if #tac x = "" then "\n" else "\napply ( " ^ (#tac x) ^ " )"
   val (spacer, fact_tac) =
     if #named_facts options then
       ( if #tac x = "" then "" else "\n"
@@ -1750,25 +1736,7 @@ let
     else
       (" ", "( fact+ )")
 in
-  if options |> #split_fact_tac then
-    apply_tac ^ spacer ^ "by " ^ fact_tac
-  else
-    "\nby" ^ tac ^ spacer ^ fact_tac
-end
-
-fun mk_subgoal_fact_tac x =
-let
-  val apply_tac = if #tac x = "" then "" else "\napply ( " ^ (#tac x) ^ " )"
-  val num_ifs = length (#if_labels x)
-  val subgoals =
-    if num_ifs = 1 then
-      "by fact"
-    else
-      ((map (K "subgoal by fact") (1 upto num_ifs)) |> join "\n")
-      ^ "\ndone"
-in
-  apply_tac ^ "\n"
-  ^ subgoals
+  "\nby" ^ tac ^ spacer ^ fact_tac
 end
 
 fun
@@ -1799,8 +1767,6 @@ let
 in
   if length (#if_labels x) = 0 then
     "\nby ( " ^ (#tac x) ^ " ) " ^ comment
-  else if opts |> #split_subgoals then
-    mk_subgoal_fact_tac x ^ "\n" ^ comment
   else
     mk_fact_tac opts x ^ " " ^ comment
 end
