@@ -124,4 +124,4 @@ yet cannot be re-parsed (or are re-parsed to a diferent term).
 See paper for more details.
 
 # Paper
-Our paper will be available on arXiv shortly.
+Our paper is available on [arXiv](http://arxiv.org/abs/2603.07771).
