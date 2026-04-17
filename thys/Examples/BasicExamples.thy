@@ -620,10 +620,7 @@ section "Multiple subgoals test"
 
 subsection "Test 1"
 
-declare[[apply2isar_split_subgoals]]
 declare[[apply2isar_named_facts = true]]
-
-
 
 text "Operates on first subgoal yielding a single new subgoal"
 lemma goals_test_1: "P \<longleftrightarrow> \<not> \<not> P"
@@ -633,22 +630,6 @@ lemma goals_test_1: "P \<longleftrightarrow> \<not> \<not> P"
    apply simp
   apply simp
   done\<close>
-proof-
-  have h_2_2: "\<not> \<not> P \<Longrightarrow> P"
-    by ( simp ) (* LEAF *)
-  have h_3_1: "P \<Longrightarrow> P"
-    by ( simp ) (* LEAF *)
-  have h_2_1: "P \<Longrightarrow> \<not> \<not> P"
-    apply ( rule cnf.clause2raw_not_not )
-    by fact
-
-  show h_1_1: "P = (\<not> \<not> P)"
-    apply ( rule iffI )
-    subgoal by fact
-    subgoal by fact
-    done
-
-qed
 proof-
   have h_2_2: "\<not> \<not> P \<Longrightarrow> P"
     by ( simp ) (* LEAF *)
@@ -1351,8 +1332,6 @@ declare[[apply2isar_print_types = false]]
 subsection "Test 1"
 
 text "From the Isabelle tutorial"
-
-declare[[apply2isar_split_fact_tac = false]]
 
 lemma back_test_1: "\<lbrakk> x = f x; triple (f x) (f x) x \<rbrakk> \<Longrightarrow> triple x x x"
   apply2isar\<open>
